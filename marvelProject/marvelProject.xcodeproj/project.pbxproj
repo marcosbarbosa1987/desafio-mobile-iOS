@@ -69,7 +69,6 @@
 			isa = PBXGroup;
 			children = (
 				CDD31FD12665C7BA00B951CB /* Domain */,
-				CDD31FD32665C7BA00B951CB /* Info.plist */,
 				CDD31FF22665CA9600B951CB /* Data */,
 				CDD31FFD2665CA9600B951CB /* DataTests */,
 				CDD31FBF2665C78F00B951CB /* Products */,
@@ -89,6 +88,7 @@
 		CDD31FD12665C7BA00B951CB /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				CDD31FD32665C7BA00B951CB /* Info.plist */,
 				CDD31FE62665C9A700B951CB /* UseCases */,
 				CDD31FE52665C99C00B951CB /* Model */,
 				CDD31FE32665C99300B951CB /* Error */,

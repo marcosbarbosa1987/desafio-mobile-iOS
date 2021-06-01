@@ -8,5 +8,5 @@
 import Foundation
 
 public protocol GetCaracteres {
-    func add(completion: @escaping(Result<MavelObject?, DomainError>) -> Void)
+    func requestCaracteres(completion: @escaping(Result<MavelObject?, DomainError>) -> Void)
 }
