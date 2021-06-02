@@ -12,18 +12,30 @@ protocol HttpGetCaracter {
     func get(url: URL)
 }
 
+protocol MD5Generator {
+    func generate(with timestamp: Int64?)
+}
+
 class RemoteGetCaracteres {
    
-    let url: URL!
     let httpGetCaracter: HttpGetCaracter!
+    let md5Generator: MD5Generator!
+    let baseUrl: URL!
+    var timestamp: Int64?
     
-    init(url: URL, httpGetCaracter: HttpGetCaracter) {
-        self.url = url
+    init(url: URL, httpGetCaracter: HttpGetCaracter, md5Generator: MD5Generator) {
+        self.baseUrl = url
         self.httpGetCaracter = httpGetCaracter
+        self.md5Generator = md5Generator
+        timestamp = Date().currentTimeMillis()
+    }
+    
+    func createTimestamp() {
+        md5Generator.generate(with: timestamp)
     }
     
     func requestCaracteres() {
-        httpGetCaracter.get(url: url)
+        httpGetCaracter.get(url: baseUrl)
     }
 }
 
@@ -31,18 +43,25 @@ class DataTests: XCTestCase {
     
     func test_if_get_should_call_correct_url() {
         let url = URL(string: "http://any-url.com")!
-        let (sut, httpGetcaracterSpy) = makeSut(url: url)
+        let (sut, httpGetCaracterSpy, _) = makeSut(url: url)
         sut.requestCaracteres()
-        XCTAssertEqual(httpGetcaracterSpy.url, [url])
+        XCTAssertEqual(httpGetCaracterSpy.url, [url])
+    }
+    
+    func test_if_get_timestamp() {
+        let (sut, _, md5GeneratorSpy) = makeSut()
+        md5GeneratorSpy.generate(with: sut.timestamp)
+        XCTAssertNotNil(md5GeneratorSpy.timestamp)
     }
 }
 
 extension DataTests {
     
-    func makeSut(url: URL) -> (RemoteGetCaracteres, HttpGetCaracterSpy) {
+    func makeSut(url: URL = URL(string: "http://any-url.com")!) -> (RemoteGetCaracteres, HttpGetCaracterSpy, MD5GeneratorSpy) {
         let httpGetCaracterSpy = HttpGetCaracterSpy()
-        let sut = RemoteGetCaracteres(url: url, httpGetCaracter: httpGetCaracterSpy)
-        return (sut, httpGetCaracterSpy)
+        let md5GeneratorSpy = MD5GeneratorSpy()
+        let sut = RemoteGetCaracteres(url: url, httpGetCaracter: httpGetCaracterSpy, md5Generator: md5GeneratorSpy)
+        return (sut, httpGetCaracterSpy, md5GeneratorSpy)
     }
 }
 
@@ -52,5 +71,20 @@ class HttpGetCaracterSpy: HttpGetCaracter {
     
     func get(url: URL) {
         self.url.append(url)
+    }
+}
+
+class MD5GeneratorSpy: MD5Generator {
+    
+    var timestamp: Int64?
+    
+    func generate(with timestamp: Int64?) {
+        self.timestamp = timestamp
+    }
+}
+
+extension Date {
+    func currentTimeMillis() -> Int64 {
+        return Int64(self.timeIntervalSince1970 * 1000)
     }
 }
